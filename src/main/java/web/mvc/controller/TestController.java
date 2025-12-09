@@ -16,6 +16,6 @@ public class TestController {
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.valueOf("text/plain;charset=UTF-8"))  //
-                .body("kkkkk!");
+                .body("kkkkk123!");
     }
 }
