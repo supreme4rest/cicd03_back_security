@@ -24,7 +24,7 @@ jobs:
 
       - name: Maven 빌드 실행
         run: ./mvnw clean package -DskipTests  # Maven 빌드 실행 (테스트 생략)
-#       run: ./mvnw clean verify  # 테스트 포함 빌드 시 이 명령어 사용
+      # run: ./mvnw clean verify  # 테스트 포함 빌드 시 이 명령어 사용
 
       - name: Docker Hub 로그인
         uses: docker/login-action@v3  # Docker Hub에 로그인하는 액션
@@ -67,3 +67,28 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/jwt-app:latest  # 최신 이미지 가져오기
             docker compose down  # 기존 컨테이너 종료
             docker compose up -d  # 백그라운드로 새 컨테이너 실행
+
+      # Slack 알림 - 성공 시
+      - name: Notify to Slack on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_USERNAME: GitHub Actions
+          SLACK_ICON_EMOJI: ':rocket:'
+          SLACK_TITLE: '✅ 배포 성공'
+          SLACK_MESSAGE: 'Main 브랜치에 push됨 → EC2에 성공적으로 배포되었습니다-추카추카! 🎉'
+          SLACK_COLOR: good
+
+      # Slack 알림 - 실패 시
+      - name: Notify to Slack on Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}  # Slack에서 생성한 Webhook URL (GitHub Secrets로 관리)
+          SLACK_USERNAME: GitHub Actions                   # Slack에 표시될 발신자 이름
+          SLACK_ICON_EMOJI: ':x:'                          # Slack 메시지 앞에 표시될 아이콘 (실패용 이모지)
+          SLACK_TITLE: '❌ 배포 실패'                        # Slack 메시지의 제목 (굵은 텍스트로 표시됨)
+          SLACK_MESSAGE: 'Main 브랜치에 push됨 → EC2 배포 중 오류가 발생했습니다. 🔥 확인이 필요합니다.'  # Slack 메시지의 본문 내용 (상세 메시지)
+          SLACK_COLOR: danger                              # 메시지 바 색상 (green=good, red=danger, yellow=warning)
+

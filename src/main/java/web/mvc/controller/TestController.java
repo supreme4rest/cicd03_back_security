@@ -16,6 +16,6 @@ public class TestController {
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.valueOf("text/plain;charset=UTF-8"))  //
-                .body("kkkkk123!");
+                .body("CI/CD 시작 !- Notify Slack");
     }
 }
